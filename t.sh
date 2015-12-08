@@ -2,7 +2,7 @@
 
 if [[ -z "$TODO_FILE" ]]
 then
-    echo "Environment variable TODO_FILE not set!"
+    echo 'Environment variable TODO_FILE not set!'
     exit 3
 fi
 
@@ -60,7 +60,7 @@ function t_done {
     local todo
     if [[ $1 =~ [0-9]+ ]]
     then
-        local n=$(($1-1))
+        local n=$(($1 - 1))
         local todo
         todo=${list[$n]}
         todo=${todo#- \[ \] }
@@ -90,7 +90,7 @@ do
     esac
 done
 
-shift "$((OPTIND-1))"
+shift $((OPTIND - 1))
 
 if [[ -n $@ ]]
 then
