@@ -26,11 +26,28 @@ function t_read {
     list=($(grep -E --ignore-case "$re.*($@)" $TODO_FILE))
     ntotal=${#list[@]}
     nlength=${#ntotal}
+
+    due_list=()
+    for i in ${!list[@]}
+    do
+        if [[ ${list[i]} =~ [0-9]{4}-[0-9]{2}-[0-9]{2} ]]
+        then
+            due_list+=(${list[i]})
+            unset list[i]
+        fi
+    done
+
+    due_list=($(printf "%s\n" "${due_list[@]}" | sed -E "s/(.*)([0-9]{4}-[0-9]{2}-[0-9]{2})/\2#\1/" | sort -g | sed -E "s/([0-9]{4}-[0-9]{2}-[0-9]{2})#(.*)/\2\1/"))
 }
 
 function t_print {
     t_read "$@"
     local n=1
+    for todo in ${due_list[@]}
+    do
+        printf "%${nlength}s %s %s\n" "$n" "${todo#- }"
+        ((n++))
+    done
     for todo in ${list[@]}
     do
         printf "%${nlength}s %s\n" "$n" "${todo#- }"
