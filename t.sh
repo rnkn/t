@@ -18,8 +18,10 @@ IFS=$'\n'
 function t_read {
     local re
     if [[ $showall ]]
-    then re='^- \[[ xX]\]'
-    else re='^- \[ \]'
+    then re='^- \[[ xX]]'
+    elif [[ $onlydone ]]
+    then re='^- \[[xX]]'
+    else re='^- \[ ]'
     fi
     list=($(grep -E --ignore-case "$re.*($@)" $TODO_FILE))
     ntotal=${#list[@]}
@@ -52,24 +54,22 @@ function t_done {
     fi
 }
 
-while getopts "as:d:e" opt
+while getopts 'as:d:De' opt
 do
     case $opt in
-        a)
-            showall=0
-            ;;
-        s)
-            t_print $OPTARG
-            exit 0
-            ;;
-        d)
-            t_done $OPTARG
-            exit 0
-            ;;
-        e)
-            "$EDITOR" "$TODO_FILE"
-            exit 0
-            ;;
+        a) showall=0
+           ;;
+        D) onlydone=0
+           ;;
+        s) t_print $OPTARG
+           exit 0
+           ;;
+        d) t_done $OPTARG
+           exit 0
+           ;;
+        e) "$EDITOR" "$TODO_FILE"
+           exit 0
+           ;;
     esac
 done
 
