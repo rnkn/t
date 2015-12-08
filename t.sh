@@ -21,7 +21,7 @@ function t_read {
     else re='^- \[ \]'
     fi
     local IFS=$'\n'
-    list=($(grep "${re}.*$@" $TODO_FILE))
+    list=($(grep -E --ignore-case "$re.*($@)" $TODO_FILE))
     ntotal=${#list[@]}
     nlength=${#ntotal}
 }
