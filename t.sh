@@ -13,6 +13,7 @@ then
 fi
 
 prefix="- [ ] "
+IFS=$'\n'
 
 function t_read {
     local re
@@ -20,7 +21,6 @@ function t_read {
     then re='^- \[[ xX]\]'
     else re='^- \[ \]'
     fi
-    local IFS=$'\n'
     list=($(grep -E --ignore-case "$re.*($@)" $TODO_FILE))
     ntotal=${#list[@]}
     nlength=${#ntotal}
@@ -28,7 +28,6 @@ function t_read {
 
 function t_print {
     t_read "$@"
-    local IFS=$'\n'
     local n=1
     for todo in ${list[@]}
     do
