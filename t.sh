@@ -38,16 +38,12 @@ function t_read {
     done
 
     due_list=($(printf "%s\n" "${due_list[@]}" | sed -E "s/(.*)([0-9]{4}-[0-9]{2}-[0-9]{2})/\2#\1/" | sort -g | sed -E "s/([0-9]{4}-[0-9]{2}-[0-9]{2})#(.*)/\2\1/"))
+    list=("${due_list[@]}" "${list[@]}")
 }
 
 function t_print {
     t_read "$@"
     local n=1
-    for todo in ${due_list[@]}
-    do
-        printf "%${nlength}s %s %s\n" "$n" "${todo#- }"
-        ((n++))
-    done
     for todo in ${list[@]}
     do
         printf "%${nlength}s %s\n" "$n" "${todo#- }"
