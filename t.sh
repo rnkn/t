@@ -42,8 +42,8 @@ function t_read {
         fi
     done
 
-    due_list=($(printf "%s\n" "${due_list[@]}" | sed -E "s/(.*)([0-9]{4}-[0-9]{2}-[0-9]{2})/\2#\1/" | sort -g | sed -E "s/([0-9]{4}-[0-9]{2}-[0-9]{2})#(.*)/\2\1/"))
-    list=("${due_list[@]}" "${list[@]}")
+    due_list=($(printf "%s\n" ${due_list[@]} | sed -E "s/(.*)([0-9]{4}-[0-9]{2}-[0-9]{2})(.*)/\2@@\1@@\3/" | sort -g | sed -E "s/([0-9]{4}-[0-9]{2}-[0-9]{2})@@(.*)@@(.*)/\2\1\3/"))
+    list=(${due_list[@]} ${list[@]})
 }
 
 function t_print {
