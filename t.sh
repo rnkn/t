@@ -23,7 +23,12 @@ function t_read {
     then re='^- \[[xX]]'
     else re='^- \[ ]'
     fi
-    list=($(grep -E --ignore-case "$re.*($@)" $TODO_FILE))
+
+    if [[ ! $@ =~ [A-Z] ]]
+    then casematch='--ignore-case'
+    fi
+
+    list=($(grep -E $casematch "$re.*($@)" $TODO_FILE))
     ntotal=${#list[@]}
     nlength=${#ntotal}
 
