@@ -6,14 +6,11 @@ then
     exit 3
 fi
 
-if [[ ! -r "$TODO_FILE" ]]
-then
-    echo "TODO_FILE not found!"
-    exit 4
-fi
-
-prefix="- [ ] "
+prefix='- [ ]'
 IFS=$'\n'
+useage="useage: t todo\n
+    t -s query\n
+    t -d [0-9]+"
 
 function t_read {
     local re
@@ -32,13 +29,12 @@ function t_read {
     ntotal=${#list[@]}
     nlength=${#ntotal}
 
-    due_list=()
+    local due_list=()
     for i in ${!list[@]}
     do
         if [[ ${list[i]} =~ [0-9]{4}-[0-9]{2}-[0-9]{2} ]]
-        then
-            due_list+=(${list[i]})
-            unset list[i]
+        then due_list+=(${list[i]})
+             unset list[i]
         fi
     done
 
@@ -47,64 +43,68 @@ function t_read {
 }
 
 function t_print {
-    t_read "$@"
+    t_read $@
+
     local n=1
     for todo in ${list[@]}
     do
-        printf "%${nlength}s %s\n" "$n" "${todo#- }"
+        printf "%${nlength}s %s\n" $n ${todo#- }
         ((n++))
     done
 }
 
 function t_done {
-    t_read
+    t_read $query
+
     local todo
     if [[ $1 =~ [0-9]+ ]]
-    then
-        local n=$(($1 - 1))
-        local todo
-        todo=${list[$n]}
-        todo=${todo#- \[ \] }
+    then todo=${list[(($1 - 1))]}
+         todo=${todo#- \[ \] }
+         todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< $todo)
     fi
-    if [[ -n "$todo" ]]
-    then sed -i -- "/$todo/ s/- \[ \]/- \[X\]/" $TODO_FILE
-    else echo "Todo $1 not found!"
+
+    if [[ -n $todo ]]
+    then sed -i -e "/$todo/ s/^- \[ ]/- \[X]/" $TODO_FILE
     fi
 }
 
-while getopts 'as:d:De' opt
+while getopts ':abBs:d:Deh' opt
 do
     case $opt in
+        b) backburner=0
+           ;;
+        B) onlybackburner=0
+           ;;
         a) showall=0
            ;;
         D) onlydone=0
            ;;
-        s) t_print $OPTARG
+        s) query=$OPTARG
+           ;;
+        d) markdone=$OPTARG
+           ;;
+        e) $EDITOR $TODO_FILE
            exit 0
            ;;
-        d) t_done $OPTARG
+        h) echo -e $useage
            exit 0
            ;;
-        e) "$EDITOR" "$TODO_FILE"
-           exit 0
-           ;;
+        :) echo "t: Option -$OPTARG requires an argument"
+           exit 2
     esac
 done
 
 shift $((OPTIND - 1))
 
-if [[ -n $@ ]]
-then
-    if [[ $@ =~ ^\/ ]]
-    then
-        t_print "${@#/}"
-    # elif [[ $@ =~ ^\. ]]
-    # then
-    #     t_done "${@#.}"
-    else
-        todo="$prefix$@"
-        echo "$todo" >> "$TODO_FILE"
-    fi
-else
-    t_print
+if [[ $@ =~ ^\/ ]]
+then query=${@#/}
+fi
+
+if [[ -n $markdone ]]
+then t_done $markdone
+elif [[ -n $query ]]
+then t_print $query
+elif [[ -n $@ ]]
+then echo "$prefix $@" >> $TODO_FILE
+else t_print
 fi
