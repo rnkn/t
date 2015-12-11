@@ -9,4 +9,5 @@ The simplest todo manager ever.
 - [X] order due dates first
 - [X] add regex group 3 (text after date)
 - [X] add case sensitivity
-- [ ] add date options
+- [X] add date options
+- [X] add ** for due/overdue todos
