@@ -64,7 +64,7 @@ function t_done {
     fi
 
     if [[ -n $todo ]]
-    then sed -i -e "/$todo/ s/^- \[ ]/- \[X]/" $TODO_FILE
+    then sed -i '' "/$todo/ s/^- \[ ]/- \[X]/" $TODO_FILE
     fi
 }
 
