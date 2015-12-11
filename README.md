@@ -50,4 +50,5 @@ todo.
 - [X] add case sensitivity
 - [X] add date options
 - [X] add ** for due/overdue todos
-- [ ] allow marking done by regex 
+- [X] allow marking done by regex
+- [ ] print long output with $PAGER

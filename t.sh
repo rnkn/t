@@ -63,12 +63,18 @@ function t_print {
 function t_done {
     t_read $query
 
-    local todo
-    if [[ $1 =~ ^[0-9]+$ ]]
-    then todo=${list[(($1 - 1))]}
-         todo=${todo#- \[ \] }
-         todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< $todo)
+    local done_list
+    if [[ $@ =~ ^[0-9]+$ ]]
+    then done_list=${list[(($1 - 1))]}
+    else done_list=($(printf "%s\n" ${list[@]} | grep $@ ))
     fi
+
+    for todo in ${done_list[@]}
+    do
+        todo=${todo#- \[ \] }
+        todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< $todo)
+        sed -i '' "/$todo/ s/^- \[ ]/- \[X]/" $TODO_FILE
+    done
 
     if [[ -n $todo ]]
     then sed -i '' "/$todo/ s/^- \[ ]/- \[X]/" $TODO_FILE
