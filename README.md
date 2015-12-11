@@ -1,6 +1,37 @@
 # t
 
-The simplest todo manager ever.
+The simplest todo manager CLI ever.
+
+- Reads and prints todos to the command line from any [GFM][] /
+  [Org Mode][] checklist.
+- Search todos by regular expression.
+- Optionally include completed todos.
+- Automatically orders todos with dates at top.
+- Displays past-due todos with \*\*asterisks\*\*
+- Mark todos done.
+- 100% Bash.
+
+This README file is a todo list.
+
+[gfm]: https://help.github.com/articles/writing-on-github/
+[org mode]: http://orgmode.org
+
+## Usage
+
+The todo list is set by the environment variable `TODO_FILE`.
+
+command   | result
+----------|-------
+`t`       | print incomplete todos
+`t -a`    | print all todos
+`t -D`    | print all done todos
+`t -s "call|email"` | print all todos matching "call" or "email"
+`t -d 12` | mark todo item 12 as done
+`t -s read -d 3` | mark todo item 3 within todos matching "read" as done
+`t -e`    | edit `$TODO_FILE` in `$EDITOR`
+`t buy milk` | add todo "buy milk"
+`t -t +1w buy racecar` | add todo "buy racecar" due a week from today
+`t -T sell horse` | add todo "sell horse" due today
 
 ## Todo
 
@@ -11,3 +42,11 @@ The simplest todo manager ever.
 - [X] add case sensitivity
 - [X] add date options
 - [X] add ** for due/overdue todos
+
+## Credit
+
+Pretty much wholly inspired by the [Python CLI by the same name][pythont] but I
+wanted to use GFM / Org Mode format and not bother with adding UUIDs to each
+todo.
+
+[pythont]: http://stevelosh.com/projects/t/ 
