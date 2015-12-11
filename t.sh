@@ -6,39 +6,46 @@ then
     exit 3
 fi
 
-prefix='- [ ]'
+prefix='- [ ] '
 IFS=$'\n'
 useage="useage: t todo\n
     t -s query\n
     t -d [0-9]+"
 
 function t_read {
-    local re
+    local re_prefix
+    local re_date='[0-9]{4}-[0-9]{2}-[0-9]{2}'
     if [[ $showall ]]
-    then re='^- \[[ xX]]'
+    then re_prefix='^- \[[ xX]] '
     elif [[ $onlydone ]]
-    then re='^- \[[xX]]'
-    else re='^- \[ ]'
+    then re_prefix='^- \[[xX]] '
+    else re_prefix='^- \[ ] '
     fi
 
     if [[ ! $@ =~ [A-Z] ]]
     then casematch='--ignore-case'
     fi
 
-    list=($(grep -E $casematch "$re.*($@)" $TODO_FILE))
-    ntotal=${#list[@]}
-    nlength=${#ntotal}
+    list=($(grep -E $casematch "$re_prefix.*($@)" $TODO_FILE))
+    n_total=${#list[@]}
+    n_length=${#n_total}
 
     local due_list=()
     for i in ${!list[@]}
     do
-        if [[ ${list[i]} =~ [0-9]{4}-[0-9]{2}-[0-9]{2} ]]
-        then due_list+=(${list[i]})
+        if [[ ${list[i]} =~ $re_date ]]
+        then item=${list[i]}
+             local date=${BASH_REMATCH//-}
+             local today=$(date +%Y%m%d)
+             if (( $date <= $today ))
+             then item=$(sed -E "s/($re_prefix)(.*)/\1**\2**/" <<< $item)
+             fi
+             due_list+=($item)
              unset list[i]
         fi
     done
 
-    due_list=($(printf "%s\n" ${due_list[@]} | sed -E "s/(.*)([0-9]{4}-[0-9]{2}-[0-9]{2})(.*)/\2@@\1@@\3/" | sort -g | sed -E "s/([0-9]{4}-[0-9]{2}-[0-9]{2})@@(.*)@@(.*)/\2\1\3/"))
+    due_list=($(printf "%s\n" ${due_list[@]} | sed -E "s/(.*)($re_date)(.*)/\2@@\1@@\3/" | sort -g | sed -E "s/($re_date)@@(.*)@@(.*)/\2\1\3/"))
     list=(${due_list[@]} ${list[@]})
 }
 
@@ -48,7 +55,7 @@ function t_print {
     local n=1
     for todo in ${list[@]}
     do
-        printf "%${nlength}s %s\n" $n ${todo#- }
+        printf "%${n_length}s %s\n" $n ${todo#- }
         ((n++))
     done
 }
@@ -57,7 +64,7 @@ function t_done {
     t_read $query
 
     local todo
-    if [[ $1 =~ [0-9]+ ]]
+    if [[ $1 =~ ^[0-9]+$ ]]
     then todo=${list[(($1 - 1))]}
          todo=${todo#- \[ \] }
          todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< $todo)
@@ -68,7 +75,7 @@ function t_done {
     fi
 }
 
-while getopts ':abBs:d:Deh' opt
+while getopts ':abBs:d:DehTt:' opt
 do
     case $opt in
         b) backburner=0
@@ -82,6 +89,10 @@ do
         s) query=$OPTARG
            ;;
         d) markdone=$OPTARG
+           ;;
+        T) due=$(date +%F)
+           ;;
+        t) due=$(date -v $OPTARG +%F)
            ;;
         e) $EDITOR $TODO_FILE
            exit 0
@@ -105,6 +116,7 @@ then t_done $markdone
 elif [[ -n $query ]]
 then t_print $query
 elif [[ -n $@ ]]
-then echo "$prefix $@" >> $TODO_FILE
+then todo="$prefix$@ $due"
+     echo $todo >> $TODO_FILE
 else t_print
 fi
