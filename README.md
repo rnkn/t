@@ -22,6 +22,7 @@ The todo list is set by the environment variable `TODO_FILE`.
 
 command   | result
 ----------|-------
+`t buy milk` | add todo "buy milk"
 `t`       | print incomplete todos
 `t -a`    | print all todos
 `t -D`    | print all done todos
@@ -29,9 +30,16 @@ command   | result
 `t -d 12` | mark todo item 12 as done
 `t -s read -d 3` | mark todo item 3 within todos matching "read" as done
 `t -e`    | edit `$TODO_FILE` in `$EDITOR`
-`t buy milk` | add todo "buy milk"
 `t -t +1w buy racecar` | add todo "buy racecar" due a week from today
 `t -T sell horse` | add todo "sell horse" due today
+
+## Credit
+
+Pretty much wholly inspired by the [Python CLI by the same name][pythont] but I
+wanted to use GFM / Org Mode format and not bother with adding UUIDs to each
+todo.
+
+[pythont]: http://stevelosh.com/projects/t/ 
 
 ## Todo
 
@@ -42,11 +50,4 @@ command   | result
 - [X] add case sensitivity
 - [X] add date options
 - [X] add ** for due/overdue todos
-
-## Credit
-
-Pretty much wholly inspired by the [Python CLI by the same name][pythont] but I
-wanted to use GFM / Org Mode format and not bother with adding UUIDs to each
-todo.
-
-[pythont]: http://stevelosh.com/projects/t/ 
+- [ ] allow marking done by regex 
