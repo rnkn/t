@@ -90,9 +90,9 @@ do
            ;;
         d) markdone=$OPTARG
            ;;
-        T) due=$(date +%F)
+        T) due=" $(date +%F)"
            ;;
-        t) due=$(date -v $OPTARG +%F)
+        t) due=" $(date -v $OPTARG +%F)"
            ;;
         e) $EDITOR $TODO_FILE
            exit 0
@@ -116,7 +116,7 @@ then t_done $markdone
 elif [[ -n $query ]]
 then t_print $query
 elif [[ -n $@ ]]
-then todo="$prefix$@ $due"
+then todo="$prefix$@$due"
      echo $todo >> $TODO_FILE
 else t_print
 fi
