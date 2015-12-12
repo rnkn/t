@@ -58,4 +58,5 @@ todo.
 - [X] add date options
 - [X] add ** for due/overdue todos
 - [X] allow marking done by regex
-- [ ] print long output with $PAGER
+- [X] print long output with $PAGER
+- [ ] print to $PAGER without mktemp
