@@ -8,9 +8,9 @@ fi
 
 prefix='- [ ] '
 IFS=$'\n'
-useage="useage: t todo\n
-    t -s query\n
-    t -d [0-9]+"
+useage='useage: t [-aD] [-s regex_match] [-d [integer|regex_match]]
+         /regexp_match
+         [-T] [-t [+|-]val[ymwd]] todo_string\n'
 
 function t_read {
     local re_prefix
