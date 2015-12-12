@@ -36,11 +36,6 @@ function t_read {
     do
         if [[ ${list[i]} =~ $RE_DATE ]]
         then item=${list[i]}
-             local date=${BASH_REMATCH//-}
-             local today=$(date +%Y%m%d)
-             if (( $date <= $today ))
-             then item=$(sed -E "s/($re_prefix)(.*)/\1**\2**/" <<< $item)
-             fi
              due_list+=($item)
              unset list[i]
         fi
@@ -54,11 +49,27 @@ function t_print {
     t_read $@
 
     local n=1
+    local buffer=$(mktemp)
     for todo in ${list[@]}
     do
-        printf "%${n_length}s %s\n" $n ${todo#- }
+        if [[ $todo =~ $RE_DATE ]]
+        then
+            local date=${BASH_REMATCH//-}
+            local today=$(date +%Y%m%d)
+            if (( $date <= $today ))
+            then todo=$(sed -E "s/($RE_PREFIX)(.*)/\1**\2**/" <<< $todo)
+            fi
+        fi
+        printf "%${n_length}s %s\n" $n ${todo#- } >> $buffer
         ((n++))
     done
+
+    if (( $LINES <= $n_total ))
+    then cat $buffer | ${PAGER:-less}
+    else cat $buffer
+    fi
+
+    rm $buffer
 }
 
 function t_done {
@@ -76,10 +87,6 @@ function t_done {
         todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< $todo)
         sed -i '' "/$todo/ s/^- \[ ]/- \[X]/" $TODO_FILE
     done
-
-    if [[ -n $todo ]]
-    then sed -i '' "/$todo/ s/^- \[ ]/- \[X]/" $TODO_FILE
-    fi
 }
 
 while getopts ':abBs:d:DehTt:' opt
