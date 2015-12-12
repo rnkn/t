@@ -18,20 +18,27 @@ This README file is a todo list.
 
 ## Usage
 
-The todo list is set by the environment variable `TODO_FILE`.
+The todo list is set by the environment variable `TODO_FILE`. The
+following assumes you've symlinked `t.sh` to `t` somewhere in your
+`$PATH`.
 
-command   | result
-----------|-------
-`t buy milk` | add todo "buy milk"
-`t`       | print incomplete todos
-`t -a`    | print all todos
-`t -D`    | print all done todos
-`t -s "call|email"` | print all todos matching "call" or "email"
-`t -d 12` | mark todo item 12 as done
-`t -s read -d 3` | mark todo item 3 within todos matching "read" as done
-`t -e`    | edit `$TODO_FILE` in `$EDITOR`
-`t -t +1w buy racecar` | add todo "buy racecar" due a week from today
-`t -T sell horse` | add todo "sell horse" due today
+command                 | result
+------------------------|-----------------------------------------------
+`t buy milk`            | add todo "buy milk"
+`t`                     | print incomplete todos
+`t -a`                  | print all todos
+`t -D`                  | print all done todos
+`t -s call`             | print all todos matching "call"
+`t /call`               | same as above
+`t -s "call|email"`     | print all todos matching "call" or "email"
+`t -D -s read`          | print all done todos matching "read"
+`t -d 12`               | mark todo item 12 as done
+`t -s read -d 3`        | mark todo item 3 within todos matching "read" as done
+`t -d burn`             | mark all todo items matching "burn" as done
+`t -s burn -d .`        | same as above
+`t -e`                  | edit `$TODO_FILE` in `$EDITOR`
+`t -t +1w buy racecar`  | add todo "buy racecar" due a week from today
+`t -T sell horse`       | add todo "sell horse" due today
 
 ## Credit
 

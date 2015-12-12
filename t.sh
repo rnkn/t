@@ -2,7 +2,7 @@
 
 if [[ -z "$TODO_FILE" ]]
 then
-    echo 'Environment variable TODO_FILE not set!'
+    printf 'Environment variable TODO_FILE not set!\n'
     exit 3
 fi
 
@@ -94,13 +94,9 @@ function t_done {
     done
 }
 
-while getopts ':abBs:d:DehTt:' opt
+while getopts ':aDs:d:Tt:he' opt
 do
     case $opt in
-        b) backburner=0
-           ;;
-        B) onlybackburner=0
-           ;;
         a) showall=0
            ;;
         D) onlydone=0
@@ -113,18 +109,18 @@ do
            ;;
         t) due=" $(date -v $OPTARG +%F)"
            ;;
+        h) printf "$useage"
+           exit 0
+           ;;
         e) $EDITOR $TODO_FILE
            exit 0
            ;;
-        h) echo -e $useage
-           exit 0
-           ;;
-        :) echo "t: Option -$OPTARG requires an argument"
+        :) printf "Option -$OPTARG requires an argument"
            exit 2
     esac
 done
 
-shift $((OPTIND - 1))
+shift $(( OPTIND - 1 ))
 
 if [[ $@ =~ ^\/ ]]
 then query=${@#/}
