@@ -76,9 +76,14 @@ function t_done {
     t_read $query
 
     local done_list
-    if [[ $@ =~ ^[0-9]+$ ]]
-    then done_list=${list[(($1 - 1))]}
-    else done_list=($(printf "%s\n" ${list[@]} | grep $@ ))
+    if [[ $1 =~ ^[0-9]+$ ]]
+    then done_list=${list[(( $1 - 1 ))]}
+    else
+        local casematch
+        if [[ ! $@ =~ [A-Z] ]]
+        then casematch='--ignore-case'
+        fi
+        done_list=($(printf "%s\n" ${list[@]} | grep $casematch $@ ))
     fi
 
     for todo in ${done_list[@]}
