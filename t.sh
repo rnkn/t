@@ -6,34 +6,35 @@ then
     exit 3
 fi
 
-prefix='- [ ] '
+PREFIX='- [ ] '
+RE_DATE='[0-9]{4}-[0-9]{2}-[0-9]{2}'
 IFS=$'\n'
+LINES=$(tput lines)
 useage='useage: t [-aD] [-s regex_match] [-d [integer|regex_match]]
          /regexp_match
          [-T] [-t [+|-]val[ymwd]] todo_string\n'
 
 function t_read {
-    local re_prefix
-    local re_date='[0-9]{4}-[0-9]{2}-[0-9]{2}'
     if [[ $showall ]]
-    then re_prefix='^- \[[ xX]] '
+    then RE_PREFIX='^- \[[ xX]] '
     elif [[ $onlydone ]]
-    then re_prefix='^- \[[xX]] '
-    else re_prefix='^- \[ ] '
+    then RE_PREFIX='^- \[[xX]] '
+    else RE_PREFIX='^- \[ ] '
     fi
 
+    local casematch
     if [[ ! $@ =~ [A-Z] ]]
     then casematch='--ignore-case'
     fi
 
-    list=($(grep -E $casematch "$re_prefix.*($@)" $TODO_FILE))
+    list=($(grep -E $casematch "$RE_PREFIX.*($@)" $TODO_FILE))
     n_total=${#list[@]}
     n_length=${#n_total}
 
     local due_list=()
     for i in ${!list[@]}
     do
-        if [[ ${list[i]} =~ $re_date ]]
+        if [[ ${list[i]} =~ $RE_DATE ]]
         then item=${list[i]}
              local date=${BASH_REMATCH//-}
              local today=$(date +%Y%m%d)
@@ -45,7 +46,7 @@ function t_read {
         fi
     done
 
-    due_list=($(printf "%s\n" ${due_list[@]} | sed -E "s/(.*)($re_date)(.*)/\2@@\1@@\3/" | sort -g | sed -E "s/($re_date)@@(.*)@@(.*)/\2\1\3/"))
+    due_list=($(printf "%s\n" ${due_list[@]} | sed -E "s/(.*)($RE_DATE)(.*)/\2@@\1@@\3/" | sort -g | sed -E "s/($RE_DATE)@@(.*)@@(.*)/\2\1\3/"))
     list=(${due_list[@]} ${list[@]})
 }
 
@@ -122,7 +123,7 @@ then t_done $markdone
 elif [[ -n $query ]]
 then t_print $query
 elif [[ -n $@ ]]
-then todo="$prefix$@$due"
+then todo="$PREFIX$@$due"
      echo $todo >> $TODO_FILE
 else t_print
 fi
