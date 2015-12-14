@@ -1,6 +1,6 @@
-# t
+# t_done
 
-The simplest todo manager CLI ever.
+The simplest CLI todo list manager ever.
 
 - Reads and prints todos to the command line from any [GFM][] /
   [Org Mode][] checklist.
@@ -19,7 +19,7 @@ This README file is a todo list.
 ## Usage
 
 The todo list is set by the environment variable `TODO_FILE`. The
-following assumes you've symlinked `t.sh` to `t` somewhere in your
+following assumes you've symlinked `t_done.sh` to `t` somewhere in your
 `$PATH`.
 
 command                 | result
@@ -42,11 +42,10 @@ command                 | result
 
 ## Credit
 
-Pretty much wholly inspired by the [Python CLI by the same name][pythont] but I
-wanted to use GFM / Org Mode format and not bother with adding UUIDs to each
-todo.
+Pretty much wholly inspired by [t][] but I wanted to use GFM / Org Mode
+format and not bother with adding UUIDs to each todo.
 
-[pythont]: http://stevelosh.com/projects/t/ 
+[t]: http://stevelosh.com/projects/t/ 
 
 ## Todo
 
