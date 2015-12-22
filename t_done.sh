@@ -10,9 +10,9 @@ IFS=$'\n'
 prefix='- [ ] '
 re_date='[0-9]{4}-[0-9]{2}-[0-9]{2}'
 lines=$(tput lines)
-usage='useage: t [-aD] [-s regex_match] [-d [integer|regex_match]]
+useage='useage: t [-aD] [-s regex_match] [-d [integer|regex_match]]
          /regexp_match
-         [-T] [-t [+|-]val[ymwd]] todo_string\n'
+         [-T] [-t [+|-]val[ymwd]] todo_string'
 
 function t_read {
     if [[ $showall ]]
@@ -27,7 +27,7 @@ function t_read {
     then _casematch='--ignore-case'
     fi
 
-    list=($(grep -E $_casematch "$re_prefix.*($@)" $TODO_FILE))
+    list=($(grep -E $_casematch "$re_prefix.*($*)" $TODO_FILE))
     n_total=${#list[@]}
     n_length=${#n_total}
 
@@ -56,7 +56,7 @@ function t_print {
         then
             local date=${BASH_REMATCH//-}
             local today=$(date +%Y%m%d)
-            if (( $date <= $today ))
+            if (( date <= today ))
             then todo=$(sed -E "s/($re_prefix)(.*)/\1**\2**/" <<< $todo)
             fi
         fi
@@ -64,8 +64,8 @@ function t_print {
         ((_n++))
     done
 
-    if (( $lines <= $n_total ))
-    then cat $_buffer | ${PAGER:-less}
+    if (( lines <= n_total ))
+    then ${PAGER:-less} < $_buffer
     else cat $_buffer
     fi
 
@@ -109,13 +109,13 @@ do
            ;;
         t) due=" $(date -v $OPTARG +%F)"
            ;;
-        h) printf "$useage"
+        h) printf "%s\n" "$useage"
            exit 0
            ;;
         e) $EDITOR $TODO_FILE
            exit 0
            ;;
-        :) printf "Option -$OPTARG requires an argument"
+        :) printf "Option -%s requires an argument\n" $OPTARG
            exit 2
     esac
 done
@@ -123,7 +123,7 @@ done
 shift $(( OPTIND - 1 ))
 
 if [[ $@ =~ ^\/ ]]
-then query=${@#/}
+then query=${*#/}
 fi
 
 if [[ -n $markdone ]]
@@ -131,7 +131,7 @@ then t_done $markdone
 elif [[ -n $query ]]
 then t_print $query
 elif [[ -n $@ ]]
-then todo="$prefix$@$due"
+then todo="$prefix$*$due"
      echo $todo >> $TODO_FILE
 else t_print
 fi

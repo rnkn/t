@@ -40,13 +40,6 @@ command                 | result
 `t -t +1w buy racecar`  | add todo "buy racecar" due a week from today
 `t -T sell horse`       | add todo "sell horse" due today
 
-## Credit
-
-Pretty much wholly inspired by [t][] but I wanted to use GFM / Org Mode
-format and not bother with adding UUIDs to each todo.
-
-[t]: http://stevelosh.com/projects/t/ 
-
 ## Todo
 
 - [X] store $query for every flag
@@ -59,3 +52,5 @@ format and not bother with adding UUIDs to each todo.
 - [X] allow marking done by regex
 - [X] print long output with $PAGER
 - [ ] print to $PAGER without mktemp
+- [ ] add --long-flags
+- [ ] allow $TODO_FILE or $HOME/.t_donerc
