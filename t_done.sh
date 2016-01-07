@@ -65,7 +65,7 @@ function t_print {
     done
 
     if (( lines <= n_total ))
-    then ${PAGER:-less} < "$_buffer"
+    then ${PAGER:-less} -X < "$_buffer"
     else cat "$_buffer"
     fi
 
