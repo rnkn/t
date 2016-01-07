@@ -54,3 +54,4 @@ command                 | result
 - [ ] print to $PAGER without mktemp
 - [ ] add --long-flags
 - [ ] allow $TODO_FILE or $HOME/.t_donerc
+- [X] conform to quoting conventions

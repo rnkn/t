@@ -27,12 +27,12 @@ function t_read {
     then _casematch='--ignore-case'
     fi
 
-    list=($(grep -E $_casematch "$re_prefix.*($*)" $TODO_FILE))
+    list=($(grep -E $_casematch "$re_prefix.*($*)" "$TODO_FILE"))
     n_total=${#list[@]}
     n_length=${#n_total}
 
     local _due_list
-    for i in ${!list[@]}
+    for i in "${!list[@]}"
     do
         if [[ ${list[i]} =~ $re_date ]]
         then item=${list[i]}
@@ -41,39 +41,39 @@ function t_read {
         fi
     done
 
-    _due_list=($(printf "%s\n" ${_due_list[@]} | sed -E "s/(.*)($re_date)(.*)/\2@@\1@@\3/" | sort -g | sed -E "s/($re_date)@@(.*)@@(.*)/\2\1\3/"))
+    _due_list=($(printf "%s\n" "${_due_list[@]}" | sed -E "s/(.*)($re_date)(.*)/\2@@\1@@\3/" | sort -g | sed -E "s/($re_date)@@(.*)@@(.*)/\2\1\3/"))
     list=(${_due_list[@]} ${list[@]})
 }
 
 function t_print {
-    t_read $@
+    t_read "$@"
 
     local _n=1
     local _buffer=$(mktemp)
-    for todo in ${list[@]}
+    for todo in "${list[@]}"
     do
         if [[ $todo =~ $re_date ]]
         then
             local date=${BASH_REMATCH//-}
             local today=$(date +%Y%m%d)
             if (( date <= today ))
-            then todo=$(sed -E "s/($re_prefix)(.*)/\1**\2**/" <<< $todo)
+            then todo=$(sed -E "s/($re_prefix)(.*)/\1**\2**/" <<< "$todo")
             fi
         fi
-        printf "%${n_length}s %s\n" $_n ${todo#- } >> $_buffer
+        printf "%${n_length}s %s\n" $_n "${todo#- }" >> "$_buffer"
         ((_n++))
     done
 
     if (( lines <= n_total ))
-    then ${PAGER:-less} < $_buffer
-    else cat $_buffer
+    then ${PAGER:-less} < "$_buffer"
+    else cat "$_buffer"
     fi
 
-    rm $_buffer
+    rm "$_buffer"
 }
 
 function t_done {
-    t_read $query
+    t_read "$query"
 
     local _done_list
     if [[ $1 =~ ^[0-9]+$ ]]
@@ -83,14 +83,14 @@ function t_done {
         if [[ ! $@ =~ [A-Z] ]]
         then _casematch='--ignore-case'
         fi
-        _done_list=($(printf "%s\n" ${list[@]} | grep $_casematch $@ ))
+        _done_list=($(printf "%s\n" "${list[@]}" | grep $_casematch "$@" ))
     fi
 
-    for todo in ${_done_list[@]}
+    for todo in "${_done_list[@]}"
     do
         todo=${todo#- \[ \] }
-        todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< $todo)
-        sed -i '' "/$todo/ s/^- \[ ]/- \[X]/" $TODO_FILE
+        todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< "$todo")
+        sed -i '' "/$todo/ s/^- \[ ]/- \[X]/" "$TODO_FILE"
     done
 }
 
@@ -112,10 +112,10 @@ do
         h) printf "%s\n" "$useage"
            exit 0
            ;;
-        e) $EDITOR $TODO_FILE
+        e) $EDITOR "$TODO_FILE"
            exit 0
            ;;
-        :) printf "Option -%s requires an argument\n" $OPTARG
+        :) printf "Option -%s requires an argument\n" "$OPTARG"
            exit 2
     esac
 done
@@ -127,11 +127,11 @@ then query=${*#/}
 fi
 
 if [[ -n $markdone ]]
-then t_done $markdone
+then t_done "$markdone"
 elif [[ -n $query ]]
-then t_print $query
+then t_print "$query"
 elif [[ -n $@ ]]
 then todo="$prefix$*$due"
-     echo $todo >> $TODO_FILE
+     echo $todo >> "$TODO_FILE"
 else t_print
 fi
