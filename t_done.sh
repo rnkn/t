@@ -10,7 +10,7 @@ IFS=$'\n'
 prefix='- [ ] '
 re_date='[0-9]{4}-[0-9]{2}-[0-9]{2}'
 lines=$(tput lines)
-useage='useage: t [-aD] [-s regex_match] [-d [integer|regex_match]]
+usage='usage: t [-aD] [-s regex_match] [-d [integer|regex_match]]
          /regexp_match
          [-T] [-t [+|-]val[ymwd]] todo_string'
 
@@ -109,7 +109,7 @@ do
            ;;
         t) due=" $(date -v $OPTARG +%F)"
            ;;
-        h) printf "%s\n" "$useage"
+        h) printf "%s\n" "$usage"
            exit 0
            ;;
         e) $EDITOR "$TODO_FILE"
