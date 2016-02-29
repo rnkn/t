@@ -55,3 +55,6 @@ command                 | result
 - [ ] add --long-flags
 - [ ] allow $TODO_FILE or $HOME/.t_donerc
 - [X] conform to quoting conventions
+- [ ] implement backburner function
+- [ ] implement delete (kill) function
+- [ ] implement multi parameter regexp query
