@@ -112,7 +112,7 @@ do
         h) printf "%s\n" "$usage"
            exit 0
            ;;
-        e) $EDITOR "$TODO_FILE"
+        e) ${EDITOR:-nano} "$target"
            exit 0
            ;;
         :) printf "Option -%s requires an argument\n" "$OPTARG"
