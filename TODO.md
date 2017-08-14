@@ -18,6 +18,3 @@
 - [X] look for ./TODO(\..+)? file before $TODO_FILE
 - [X] add export/unnumbered flag (-n)
 - [ ] add open url flag (-u)
-bananas
-apples
-oranges
