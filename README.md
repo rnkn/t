@@ -1,5 +1,3 @@
-# t_done
-
 The simplest CLI todo list manager ever.
 
 - Reads and prints todos to the command line from any [GFM][] /
@@ -10,8 +8,6 @@ The simplest CLI todo list manager ever.
 - Displays past-due todos with \*\*asterisks\*\*
 - Mark todos done.
 - 100% Bash.
-
-This README file is a todo list.
 
 [gfm]: https://help.github.com/articles/writing-on-github/
 [org mode]: http://orgmode.org
@@ -39,22 +35,3 @@ command                 | result
 `t -e`                  | edit `$TODO_FILE` in `$EDITOR`
 `t -t +1w buy racecar`  | add todo "buy racecar" due a week from today
 `t -T sell horse`       | add todo "sell horse" due today
-
-## Todo
-
-- [X] store $query for every flag
-- [X] add -D flag for only show done
-- [X] order due dates first
-- [X] add regex group 3 (text after date)
-- [X] add case sensitivity
-- [X] add date options
-- [X] add ** for due/overdue todos
-- [X] allow marking done by regex
-- [X] print long output with $PAGER
-- [ ] print to $PAGER without mktemp
-- [ ] add --long-flags
-- [ ] allow $TODO_FILE or $HOME/.t_donerc
-- [X] conform to quoting conventions
-- [ ] implement backburner function
-- [ ] implement delete (kill) function
-- [ ] implement multi parameter regexp query
