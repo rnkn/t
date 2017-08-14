@@ -14,4 +14,5 @@ link : t_done.sh
 	ln -sf $(SRC_PATH) $(DEST_PATH)
 
 install : t_done.sh
+	rm $(DEST_PATH)
 	cp -RP $(SRC_PATH) $(DEST_PATH)
