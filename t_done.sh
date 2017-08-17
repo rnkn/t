@@ -169,7 +169,18 @@ function t_toggle {
     done
 }
 
-while getopts ':heaDns:k:d:z:Tt:' opt
+function t_openurl {
+    t_read "$query"
+    t_select "$1"
+
+    urls=($(printf "%s\n" "${selection[@]}" | grep -Eo "https?://[^ ]+"))
+    for url in "${urls[@]}"
+    do
+        open "$url" && echo "t: opening ${url} ..."
+    done
+}
+
+while getopts ':heaDns:k:d:z:u:Tt:' opt
 do
     case $opt in
         h) printf "%s\n" "$usage"
@@ -183,6 +194,7 @@ do
         k) kill=$OPTARG;;
         d) markdone=$OPTARG;;
         z) toggle=$OPTARG;;
+        u) openurl=$OPTARG;;
         T) due=" $(date +%F)";;
         t) due=" $(date -v $OPTARG +%F)";;
         :) printf "t: option -%s requires an argument\n" "$OPTARG"
@@ -197,7 +209,10 @@ shift $(( OPTIND - 1 ))
 
 [[ $@ =~ ^\/ ]] && query="${*#/}"
 
-if [[ -n $markdone ]]
+if [[ -n $openurl ]]
+then
+    t_openurl "$openurl"
+elif [[ -n $markdone ]]
 then
     t_done "$markdone"
 elif [[ -n $toggle ]]
