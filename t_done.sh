@@ -131,7 +131,7 @@ function t_select {
 
 function t_done {
     t_read "$query"
-    t_select "$@"
+    t_select "$1"
 
     for todo in "${selection[@]}"
     do
@@ -142,7 +142,7 @@ function t_done {
 
 function t_kill {
     t_read "$query"
-    t_select "$@"
+    t_select "$1"
 
     for todo in "${selection[@]}"
     do
@@ -153,7 +153,7 @@ function t_kill {
 
 function t_toggle {
     t_read "$query"
-    t_select "$@"
+    t_select "$1"
 
     for todo in "${selection[@]}"
     do
