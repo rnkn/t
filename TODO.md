@@ -17,4 +17,4 @@
 - [X] add undo/toggle flag (-z)
 - [X] look for ./TODO(\..+)? file before $TODO_FILE
 - [X] add export/unnumbered flag (-n)
-- [ ] add open url flag (-u)
+- [X] add open url flag (-u)
