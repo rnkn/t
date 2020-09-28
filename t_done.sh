@@ -183,25 +183,25 @@ function t_openurl {
 while getopts ':heaDns:k:d:z:u:Tt:' opt
 do
     case $opt in
-        h) printf "%s\n" "$usage"
-           exit 0;;
-        e) ${EDITOR:-nano} "$todofile"
-           exit 0;;
-        a) showall=0;;
-        D) onlydone=0;;
-        n) export=0;;
-        s) query=$OPTARG;;
-        k) kill=$OPTARG;;
-        d) markdone=$OPTARG;;
-        z) toggle=$OPTARG;;
-        u) openurl=$OPTARG;;
-        T) due=" $(date +%F)";;
-        t) due=" $(date -v $OPTARG +%F)";;
-        :) printf "t: option -%s requires an argument\n" "$OPTARG"
-           exit 2;;
-        *) printf "t: unrecognized option -%s\n\n" "$OPTARG"
-           printf "%s\n" "$usage"
-           exit 1;;
+        (h) printf "%s\n" "$usage"
+            exit 0;;
+        (e) ${EDITOR:-nano} "$todofile"
+            exit 0;;
+        (a) showall=0;;
+        (D) onlydone=0;;
+        (n) export=0;;
+        (s) query=$OPTARG;;
+        (k) kill=$OPTARG;;
+        (d) markdone=$OPTARG;;
+        (z) toggle=$OPTARG;;
+        (u) openurl=$OPTARG;;
+        (T) due=" $(date +%F)";;
+        (t) due=" $(date -v $OPTARG +%F)";;
+        (:) printf "t: option -%s requires an argument\n" "$OPTARG"
+            exit 2;;
+        (*) printf "t: unrecognized option -%s\n\n" "$OPTARG"
+            printf "%s\n" "$usage"
+            exit 1;;
     esac
 done
 
