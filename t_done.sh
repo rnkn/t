@@ -1,6 +1,7 @@
 #! /usr/bin/env bash
 
-usage="$(cat <<'EOF'
+usage() {
+    cat <<EOF
 usage:
     t [-aD]
     t [-aD] [-s REGEX_STRING] [-d [INTEGER|REGEX_STRING]]
@@ -29,7 +30,8 @@ examples:
                             (for date syntax, see date manual entry)
     t -n                  print unnumbered output (suitable for redirection)
 EOF
-)"
+    exit 1
+}
 
 IFS=$'\n'
 red='\e[0;31m'
@@ -183,8 +185,7 @@ function t_openurl {
 while getopts ':heaDns:k:d:z:u:Tt:' opt
 do
     case $opt in
-        (h) printf "%s\n" "$usage"
-            exit 0;;
+        (h) usage ;;
         (e) ${EDITOR:-nano} "$todofile"
             exit 0;;
         (a) showall=0;;
@@ -198,10 +199,9 @@ do
         (T) due=" $(date +%F)";;
         (t) due=" $(date -v $OPTARG +%F)";;
         (:) printf "t: option -%s requires an argument\n" "$OPTARG"
-            exit 2;;
+            exit 2 ;;
         (*) printf "t: unrecognized option -%s\n\n" "$OPTARG"
-            printf "%s\n" "$usage"
-            exit 1;;
+            usage ;;
     esac
 done
 
