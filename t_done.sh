@@ -56,7 +56,7 @@ then printf 'No todo file found or environment variable TODO_FILE not set!\n'
      exit 3
 fi
 
-function t_read {
+t_read() {
     if [[ $onlydone ]]
     then
         re_prefix=$re_done
@@ -86,7 +86,7 @@ function t_read {
     todo_list=(${due_list[@]} ${todo_list[@]})
 }
 
-function t_print {
+t_print() {
     t_read "$query"
 
     local n=1
@@ -120,7 +120,7 @@ function t_print {
     rm "$buffer"
 }
 
-function t_select {
+t_select() {
     if [[ $1 =~ ^[0-9]+$ ]]
     then
         selection=${todo_list[(( $1 - 1 ))]}
@@ -131,7 +131,7 @@ function t_select {
     fi
 }
 
-function t_done {
+t_done() {
     t_read "$query"
     t_select "$1"
 
@@ -142,7 +142,7 @@ function t_done {
     done
 }
 
-function t_kill {
+t_kill() {
     t_read "$query"
     t_select "$1"
 
@@ -153,7 +153,7 @@ function t_kill {
     done
 }
 
-function t_toggle {
+t_toggle() {
     t_read "$query"
     t_select "$1"
 
@@ -171,7 +171,7 @@ function t_toggle {
     done
 }
 
-function t_openurl {
+t_openurl() {
     t_read "$query"
     t_select "$1"
 
