@@ -1,18 +1,6 @@
-SRC_ROOT := $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
-SRC_PATH := $(dir $(abspath $(firstword $(MAKEFILE_LIST))))t_done.sh
-PREFIX ?= /usr/local/bin
-NAME ?= t
-DEST_PATH = $(PREFIX)/$(NAME)
+PROGRAM		= t_done.sh
+PREFIX		?= /usr/local
+CLI			?= t
 
-help :
-	$(info prefix : ${PREFIX})
-	$(info name : ${NAME})
-	$(info make install : install to ${PREFIX})
-	$(info make link : create symbolic link ${SRC_PATH} -> ${DEST_PATH})
-
-link : t_done.sh
-	ln -sf $(SRC_PATH) $(DEST_PATH)
-
-install : t_done.sh
-	rm $(DEST_PATH)
-	cp -RP $(SRC_PATH) $(DEST_PATH)
+install:
+	install -m 755 $(PROGRAM) $(PREFIX)/bin/$(CLI)
