@@ -68,7 +68,7 @@ t_read() {
     fi
 
     local casematch
-    [[ ! $* =~ [A-Z] ]] && casematch='--ignore-case'
+    [[ ! $* =~ [A-Z] ]] && casematch='-i'
     todo_list=($(grep -E $casematch "$re_prefix.*($*)" "$todofile"))
     local due_list
     local item
@@ -126,7 +126,7 @@ t_select() {
         selection=${todo_list[(( $1 - 1 ))]}
     else
         local casematch
-        [[ ! $@ =~ [A-Z] ]] && casematch='--ignore-case'
+        [[ ! $@ =~ [A-Z] ]] && casematch='-i'
         selection=($(printf "%s\n" "${todo_list[@]}" | grep $casematch "$@" ))
     fi
 }
@@ -138,7 +138,7 @@ t_done() {
     for todo in "${selection[@]}"
     do
         todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< "$todo")
-        sed -i '' "/$todo/s/^- \[ ]/- \[X]/" "$todofile"
+        sed -i'' "/$todo/s/^- \[ ]/- \[X]/" "$todofile"
     done
 }
 
@@ -186,7 +186,7 @@ while getopts ':heaDns:k:d:z:u:Tt:' opt
 do
     case $opt in
         (h) usage ;;
-        (e) ${EDITOR:-nano} "$todofile"
+        (e) ${EDITOR:-vi} "$todofile"
             exit 0;;
         (a) showall=0;;
         (D) onlydone=0;;
