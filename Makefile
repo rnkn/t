@@ -1,6 +1,7 @@
-PROGRAM		= t_done.sh
-PREFIX		?= /usr/local
-CLI			?= t
+.POSIX:
+SRC		= todo.sh
+PREFIX		= /usr/local
+TARGET		= t
 
 install:
-	install -m 755 $(PROGRAM) $(PREFIX)/bin/$(CLI)
+	install -m755 ${SRC} ${PREFIX}/bin/${TARGET}
