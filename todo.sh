@@ -8,7 +8,10 @@ for f in *; do
 	expr "$f" : [Tt][Oo][Dd][Oo] > /dev/null && todo_file="$f" && break
 done
 
-test -f "$todo_file" || fail "TODO_FILE not found"
+[ -n $todo_file ] || todo_file="${TODO_FILE:-${PWD}/TODO}"
+
+todo_alt_file="${TODO_ALT_FILE:-${PWD}/REMEMBER}"
+done_file="${DONE_FILE:-${PWD}/DONE}"
 
 usage() {
 	echo "usage: $program TASK"
