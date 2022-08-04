@@ -1,5 +1,6 @@
 #!/bin/sh
 
+set -o pipefail
 program=$(basename "$0")
 fail() { echo "$1"; exit 1; }
 
