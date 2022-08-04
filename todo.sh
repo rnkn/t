@@ -4,7 +4,9 @@ set -o pipefail
 program=$(basename "$0")
 fail() { echo "$1"; exit 1; }
 
-todo_file="${TODO_FILE:-${PWD}/TODO}"
+for f in *; do
+	expr "$f" : [Tt][Oo][Dd][Oo] > /dev/null && todo_file="$f" && break
+done
 
 test -f "$todo_file" || fail "TODO_FILE not found"
 
