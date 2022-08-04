@@ -32,6 +32,7 @@ t_done() {
 }
 
 t_print() {
+	[ -f "$todo_file" ] || fail "File not found"
 	lines=$(wc -l < "$todo_file")
 	width=$(echo $lines | wc -c)
 	nl -s' ' -w"$width" "$todo_file"
