@@ -18,11 +18,15 @@ usage() {
 	echo "       $program [-d LINENUM] [-e] [-Ss QUERY]"
 }
 
-# t_done(int)
+# t_done(linenum, done)
 t_done() {
-	int=$1
+	[ -f "$todo_file" ] || fail "File not found"
+	linenum=$1; done=$2
 	tmpfile=$(mktemp)
-	sed -n "${int}!p" "$todo_file" > "$tmpfile"
+	if [ "$done" -eq 1 ]; then
+		sed -n "${linenum}p" "$todo_file" >> "$done_file"
+	fi
+	sed "${linenum}d" "$todo_file" > "$tmpfile"
 	mv "$todo_file" "${todo_file}~"
 	mv "$tmpfile" "$todo_file"
 }
