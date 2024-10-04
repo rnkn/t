@@ -1,5 +1,5 @@
 .POSIX:
-SRC		= todo.sh
+SRC			= t_done.sh
 PREFIX		= /usr/local
 TARGET		= t
 
