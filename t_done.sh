@@ -55,7 +55,7 @@ fi
 t_read() {
 	query="$*"
 	casematch=
-	expr "$query" : '\(.*[A-Z].*\)' > /dev/null && casematch='-i'
+	expr "$query" : '\(.*[A-Z].*\)' > /dev/null || casematch='-i'
 	todo_list=$(grep $casematch "$re_prefix.*$*" "$todo_file")
 
 	if [ -n "$todo_list" ]; then
@@ -112,7 +112,7 @@ t_select() {
 		sed -n "$1p"
 	else
 		casematch=
-		expr "$1" : '.*[A-Z].*' > /dev/null && casematch='-i'
+		expr "$1" : '.*[A-Z].*' > /dev/null || casematch='-i'
 		grep $casematch "$*"
 	fi
 }
