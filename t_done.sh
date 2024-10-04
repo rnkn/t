@@ -3,26 +3,30 @@
 usage() {
 	cat <<EOF
 usage:
-	t [-aDen]
-	t [-aDT] [-s REGEX_STRING] [-d [INTEGER|REGEX_STRING]]
+    t [-aDehn]
+    t [-T] STRING
+    t [-aD] [-s REGEX_STRING] [-d [INTEGER|REGEX_STRING]]
+    t [-aD] [-s REGEX_STRING] [-k [INTEGER|REGEX_STRING]]
+    t [-aD] [-s REGEX_STRING] [-b [INTEGER|REGEX_STRING]]
+    t [-aD] [-s REGEX_STRING] [-z [INTEGER|REGEX_STRING]]
 
 examples:
-	t					  print incomplete todos
-	t -a				  print all todos
-	t -D				  print all done todos
-	t -s call			  print all todos matching "call"
-	t -s "call|email"	  print all todos matching "call" or "email"
-	t -D -s read		  print all done todos matching "read"
-	t -d 12				  mark todo item 12 as done
-	t -s read -d 3		  mark todo item 3 within todos matching "read" as done
-	t -d burn			  mark all todos matching "burn" as done
-	t -s burn -d .		  same as above
-	t -k 7				  delete todo item 7
-	t -k bunnies		  delete all todos matching "bunnies"
-	t -s bunnies -k .	  same as above
-	t -e				  edit TODO_FILE in $EDITOR
-	t -T sell horse	  add todo "sell horse" due today
-	t -n				  print unnumbered output (suitable for redirection)
+    t                     print incomplete todos
+    t -a                  print all todos
+    t -D                  print all done todos
+    t -s call             print all todos matching "call"
+    t -s "call|email"     print all todos matching "call" or "email"
+    t -D -s read          print all done todos matching "read"
+    t -d 12               mark todo item 12 as done
+    t -s read -d 3        mark todo item 3 within todos matching "read" as done
+    t -d burn             mark all todos matching "burn" as done
+    t -s burn -d .        same as above
+    t -k 7                delete todo item 7
+    t -k bunnies          delete all todos matching "bunnies"
+    t -s bunnies -k .     same as above
+    t -e                  edit TODO_FILE in $EDITOR
+    t -T sell horse       add todo "sell horse" due today
+    t -n                  print unnumbered output (suitable for redirection)
 EOF
 	exit 1
 }
