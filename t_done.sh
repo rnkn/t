@@ -104,7 +104,7 @@ t_print() {
 
 			if [ -n "$date" ] && [ -z "$onlydone$showall" ]; then
 				today=$(date +%Y%m%d)
-				if [ "$today" -gt "$date" ]; then
+				if [ "$today" -ge "$date" ]; then
 					todo=$(echo "$todo" |
 							   sed -E "s/($re_prefix)(.*)/\1** \2 **/")
 				fi
