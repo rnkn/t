@@ -1,233 +1,195 @@
-#! /usr/bin/env bash
+#! /bin/sh
 
 usage() {
-    cat <<EOF
+	cat <<EOF
 usage:
-    t [-aD]
-    t [-aD] [-s REGEX_STRING] [-d [INTEGER|REGEX_STRING]]
-    t /REGEX_STRING
-    t [-T] [-t [+|-]VAL[ymwd]] STRING
+	t [-aDen]
+	t [-aDT] [-s REGEX_STRING] [-d [INTEGER|REGEX_STRING]]
 
 examples:
-    t                     print incomplete todos
-    t -a                  print all todos
-    t -D                  print all done todos
-    t -s call             print all todos matching "call"
-    t /call               same as above
-    t -s "call|email"     print all todos matching "call" or "email"
-    t -D -s read          print all done todos matching "read"
-    t -d 12               mark todo item 12 as done
-    t -s read -d 3        mark todo item 3 within todos matching "read" as done
-    t -d burn             mark all todos matching "burn" as done
-    t -s burn -d .        same as above
-    t -k 7                delete todo item 7
-    t -k bunnies          delete all todos matching "bunnies"
-    t -s bunnies -k .     same as above
-    t -e                  edit $TODO_FILE in $EDITOR
-    t -T sell horse       add todo "sell horse" due today
-    t -t 20d celebrate    add todo "celebrate" due on the 20th of this month
-    t -t +1w buy racecar  add todo "buy racecar" due a week from today
-                            (for date syntax, see date manual entry)
-    t -n                  print unnumbered output (suitable for redirection)
+	t					  print incomplete todos
+	t -a				  print all todos
+	t -D				  print all done todos
+	t -s call			  print all todos matching "call"
+	t -s "call|email"	  print all todos matching "call" or "email"
+	t -D -s read		  print all done todos matching "read"
+	t -d 12				  mark todo item 12 as done
+	t -s read -d 3		  mark todo item 3 within todos matching "read" as done
+	t -d burn			  mark all todos matching "burn" as done
+	t -s burn -d .		  same as above
+	t -k 7				  delete todo item 7
+	t -k bunnies		  delete all todos matching "bunnies"
+	t -s bunnies -k .	  same as above
+	t -e				  edit TODO_FILE in $EDITOR
+	t -T sell horse	  add todo "sell horse" due today
+	t -n				  print unnumbered output (suitable for redirection)
 EOF
-    exit 1
+	exit 1
 }
 
-IFS=$'\n'
-red='\e[0;31m'
-clear='\e[0m'
-str_prefix='- [ ] '
-re_todofile='[Tt][Oo][Dd][Oo](\.[^.]+)?'
+re_todo_file='[Tt][Oo][Dd][Oo].*'
 re_todo='^- \[ ] '
 re_done='^- \[[xX]] '
 re_either='^- \[[ xX]] '
-re_date='[0-9]{4}-[0-9]{2}-[0-9]{2}'
-lines=$(tput lines)
+re_date='[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
 
-for file in *
-do
-    [[ $file =~ $re_todofile ]] && todofile="$file"
+for f in *; do
+	expr "$f" : "$re_todo_file" > /dev/null && todo_file="$f" && break
 done
 
-if [[ ! $todofile && -r $TODO_FILE ]]
-then todofile="$TODO_FILE"
-elif [[ ! $todofile ]]
-then printf 'No todo file found or environment variable TODO_FILE not set!\n'
-     exit 3
+if [ ! "$todo_file" ]; then
+	if [ -r "$TODO_FILE" ]; then
+		todo_file="$TODO_FILE"
+	else
+		echo 'No todo file found'
+		exit 1
+	fi
 fi
 
+# t_read(query)
+# returns: sorted list of matching todos
 t_read() {
-    if [[ $onlydone ]]
-    then
-        re_prefix=$re_done
-    elif [[ $showall ]]
-    then
-        re_prefix=$re_either
-    else
-        re_prefix=$re_todo
-    fi
+	query="$*"
+	casematch=
+	expr "$query" : '\(.*[A-Z].*\)' > /dev/null && casematch='-i'
+	todo_list=$(grep $casematch "$re_prefix.*$*" "$todo_file")
 
-    local casematch
-    [[ ! $* =~ [A-Z] ]] && casematch='-i'
-    todo_list=($(grep -E $casematch "$re_prefix.*($*)" "$todofile"))
-    local due_list
-    local item
-    for i in "${!todo_list[@]}"
-    do
-        if [[ ${todo_list[i]} =~ $re_date ]]
-        then
-            item="${todo_list[i]}"
-            due_list+=("$item")
-            unset todo_list[i]
-        fi
-    done
+	if [ -n "$todo_list" ]; then
+		due_list=$(echo "$todo_list" | grep "$re_date")
+		todo_list=$(echo "$todo_list" | grep -v "$re_date")
+		due_list=$(echo "$due_list" | sed -E "s/.*($re_date).*/\1&/" |
+					   sort -n | sed -E "s/^$re_date//")
 
-    due_list=($(printf "%s\n" "${due_list[@]}" | sed -E "s/.*($re_date).*/\1&/" | sort -g | sed -E "s/^$re_date//"))
-    todo_list=(${due_list[@]} ${todo_list[@]})
+		# printf '%s\n%s\n' "$due_list" "$todo_list"
+		if [ -n "$due_list" ] && [ -n "$todo_list" ]; then
+			printf '%s\n%s\n' "$due_list" "$todo_list"
+		elif [ -n "$due_list" ]; then
+			printf '%s\n' "$due_list"
+		else
+			printf '%s\n' "$todo_list"
+		fi
+	fi
 }
 
+# t_print(prefix)
+# returns: todo list printed to stdout
 t_print() {
-    t_read "$query"
+	input=$(cat)
+	if [ -n "$input" ]; then
+		n=1
+		n_width=$(echo "$input" | wc -l | xargs | wc -c)
 
-    local n=1
-    local buffer=$(mktemp)
-    local n_total=${#todo_list[@]}
-    local n_width=${#n_total}
+		echo "$input" | while read -r todo; do
+			date=$(expr "$todo" : ".*\($re_date\)" | sed 's/-//g')
+			today=
 
-    for todo in "${todo_list[@]}"
-    do
-        if [[ $todo =~ $re_todo && $todo =~ $re_date ]]
-        then
-            local date=${BASH_REMATCH//-}
-            local today=$(date +%Y%m%d)
-            (( date <= today )) && todo=$(sed -E "s/($re_prefix)(.*)/\1** \2 **/" <<< "$todo")
-        fi
+			if [ -n "$date" ] && [ -z "$onlydone$showall" ]; then
+				today=$(date +%Y%m%d)
+				if [ "$date" -gt "$today" ]; then
+					todo=$(echo "$todo" |
+							   sed -E "s/($re_prefix)(.*)/\1** \2 **/")
+				fi
+			fi
 
-        if [[ $export ]]
-        then
-            printf "%s\n" "${todo}" >> "$buffer"
-        else
-            printf "%${n_width}s %s\n" "$n" "${todo#- }" >> "$buffer"
-        fi
-        (( n++ ))
-    done
-
-    if (( lines <= n_total ))
-    then ${PAGER:-less} -X < "$buffer"
-    else cat "$buffer"
-    fi
-
-    rm "$buffer"
+			if [ -n "$export" ]; then
+				printf "%s\n" "${todo}"
+			else
+				printf "%${n_width}s %s\n" "$n" "${todo#- }"
+			fi
+			n=$(( n + 1 ))
+		done
+	fi
 }
 
+# t_select(number|regex)
+# returns: selected todos
 t_select() {
-    if [[ $1 =~ ^[0-9]+$ ]]
-    then
-        selection=${todo_list[(( $1 - 1 ))]}
-    else
-        local casematch
-        [[ ! $@ =~ [A-Z] ]] && casematch='-i'
-        selection=($(printf "%s\n" "${todo_list[@]}" | grep $casematch "$@" ))
-    fi
+	if expr "$1" + 0 > /dev/null 2>&1; then
+		sed -n "$1p"
+	else
+		casematch=
+		expr "$1" : '.*[A-Z].*' > /dev/null && casematch='-i'
+		grep $casematch "$*"
+	fi
 }
 
+# t_done(number|regex)
+# returns: altered todo_file
 t_done() {
-    t_read "$query"
-    t_select "$1"
-
-    for todo in "${selection[@]}"
-    do
-        todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< "$todo")
-        sed -i'' "/$todo/s/^- \[ ]/- \[X]/" "$todofile"
-    done
+	 t_select "$1" |
+		while read -r todo; do
+			tmp=$(mktemp)
+			awk -v str="$todo" \
+				'$0 == str { gsub (/- \[ ]/, "- [x]") } { print }' \
+				"$todo_file" > "$tmp"
+			mv "$tmp" "$todo_file"
+		done
 }
 
+# t_kill()
 t_kill() {
-    t_read "$query"
-    t_select "$1"
-
-    for todo in "${selection[@]}"
-    do
-        todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< "$todo")
-        sed -i '' "/$todo/d" "$todofile"
-    done
+	t_select "$1" |
+		while read -r todo; do
+			tmp=$(mktemp)
+			awk -v str="$todo" '$0 != str' "$todo_file" > "$tmp"
+			mv "$tmp" "$todo_file"
+		done
 }
 
 t_toggle() {
-    t_read "$query"
-    t_select "$1"
-
-    for todo in "${selection[@]}"
-    do
-        if [[ $todo =~ $re_done ]]
-        then
-            todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< "$todo")
-            sed -i '' "/$todo/s/^- \[[xX]]/- [ ]/" "$todofile"
-        elif [[ $todo =~ $re_todo ]]
-        then
-            todo=$(sed 's/[][\/$*.^|]/\\&/g' <<< "$todo")
-            sed -i '' "/$todo/s/^- \[ ]/- [X]/" "$todofile"
-        fi
-    done
+	t_select "$1" |
+		while read -r todo; do
+			tmp=$(mktemp)
+			check=
+			expr "$todo" : "$re_done" > /dev/null &&
+				check='- [ ]' || check='- [x]'
+			awk -v str="$todo" -v check="$check" \
+				'$0 == str { gsub (/- \[[ xX]]/, check) } { print }' \
+				"$todo_file" > "$tmp"
+			mv "$tmp" "$todo_file"
+		done
 }
 
 t_openurl() {
-    t_read "$query"
-    t_select "$1"
-
-    urls=($(printf "%s\n" "${selection[@]}" | grep -Eo "https?://[^ ]+"))
-    for url in "${urls[@]}"
-    do
-        open "$url" && echo "t: opening ${url} ..."
-    done
+	t_select "$1" | grep -Eo "https?://[^ ]+" | xargs open
 }
 
-while getopts ':heaDns:k:d:z:u:Tt:' opt
-do
-    case $opt in
-        (h) usage ;;
-        (e) ${EDITOR:-vi} "$todofile"
-            exit 0;;
-        (a) showall=0;;
-        (D) onlydone=0;;
-        (n) export=0;;
-        (s) query=$OPTARG;;
-        (k) kill=$OPTARG;;
-        (d) markdone=$OPTARG;;
-        (z) toggle=$OPTARG;;
-        (u) openurl=$OPTARG;;
-        (T) due=" $(date +%F)";;
-        (t) due=" $(date -v $OPTARG +%F)";;
-        (:) printf "t: option -%s requires an argument\n" "$OPTARG"
-            exit 2 ;;
-        (*) printf "t: unrecognized option -%s\n\n" "$OPTARG"
-            usage ;;
-    esac
+while getopts ':ab:Dd:ehk:ns:Tz:' opt; do
+	case $opt in
+		(h) usage ;;
+		(a) showall=0;;
+		(b) openurl=$OPTARG;;
+		(D) onlydone=0;;
+		(d) markdone=$OPTARG;;
+		(e) ${EDITOR:-vi} "$todo_file"; exit 0;;
+		(k) kill=$OPTARG;;
+		(n) export=0;;
+		(s) query=$OPTARG;;
+		(T) due=" $(date +%F)";;
+		(z) toggle=$OPTARG;;
+		(:) printf "t: option -%s requires an argument\n" "$OPTARG"
+			exit 2 ;;
+		(*) printf "t: unrecognized option -%s\n\n" "$OPTARG"
+			usage ;;
+	esac
 done
 
 shift "$(( OPTIND - 1 ))"
 
-[[ $@ =~ ^\/ ]] && query="${*#/}"
-
-if [[ -n $openurl ]]
-then
-    t_openurl "$openurl"
-elif [[ -n $markdone ]]
-then
-    t_done "$markdone"
-elif [[ -n $toggle ]]
-then
-    t_toggle "$toggle"
-elif [[ -n $kill ]]
-then
-    t_kill "$kill"
-elif [[ -n $query ]]
-then
-    t_print "$query"
-elif [[ -n $@ ]]
-then
-    todo="$str_prefix$*$due"
-    echo $todo >> "$todofile"
+if [ -n "$onlydone" ]; then
+	re_prefix="$re_done"
+elif [ -n "$showall" ]; then
+	re_prefix="$re_either"
 else
-    t_print
+	re_prefix="$re_todo"
+fi
+
+if	 [ -n "$markdone" ]; then t_read "$query" | t_done "$markdone"
+elif [ -n "$toggle" ]; then t_read "$query" | t_toggle "$toggle"
+elif [ -n "$kill" ]; then t_read "$query" | t_kill "$kill"
+elif [ -n "$openurl" ]; then t_read "$query" | t_openurl "$openurl"
+elif [ -n "$query" ]; then t_read "$query" | t_print "$re_prefix"
+elif [ -n "$*" ]; then
+	echo "- [ ] $*${due}" >> "$todo_file"
+else t_read | t_print "$re_prefix"
 fi
