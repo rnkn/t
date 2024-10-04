@@ -1,1 +1,38 @@
-The simplest CLI todo list manager ever.
+Simple POSIX shell todo list manager
+------------------------------------
+
+  - reads and prints todos to the command line from any GFM or
+    Org Mode checklist
+  - search todos by regular expression
+  - view completed/all todos
+  - automatically orders todos with dates at top
+  - displays past-due todos with ** asterisks **
+  - marks todos done
+
+usage:
+    t [-aDehn]
+    t [-T] STRING
+    t [-aD] [-s REGEX_STRING] [-d [INTEGER|REGEX_STRING]]
+    t [-aD] [-s REGEX_STRING] [-k [INTEGER|REGEX_STRING]]
+    t [-aD] [-s REGEX_STRING] [-b [INTEGER|REGEX_STRING]]
+    t [-aD] [-s REGEX_STRING] [-z [INTEGER|REGEX_STRING]]
+
+examples:
+    t                     print incomplete todos
+    t -a                  print all todos
+    t -D                  print all done todos
+    t -s call             print all todos matching "call"
+    t -s "call|email"     print all todos matching "call" or "email"
+    t -D -s read          print all done todos matching "read"
+    t -d 12               mark todo item 12 as done
+    t -s read -d 3        mark todo item 3 within todos matching
+                          "read" as done
+    t -d burn             mark all todos matching "burn" as done
+    t -s burn -d .        same as above
+    t -k 7                delete todo item 7
+    t -k bunnies          delete all todos matching "bunnies"
+    t -s bunnies -k .     same as above
+    t -e                  edit TODO_FILE in $EDITOR
+    t -T sell horse       add todo "sell horse" due today
+    t -n                  print unnumbered output (suitable for
+                          redirection)
