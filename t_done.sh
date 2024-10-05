@@ -139,7 +139,7 @@ t_done() {
 		while read -r todo; do
 			tmp=$(mktemp)
 			awk -v str="$todo" \
-				'$0 == str { gsub (/- \[ ]/, "- [x]") } { print }' \
+				'$0 == str { gsub (/- \[ ]/, "- [X]") } { print }' \
 				"$todo_file" > "$tmp"
 			mv "$tmp" "$todo_file"
 		done
@@ -161,7 +161,7 @@ t_toggle() {
 			tmp=$(mktemp)
 			check=
 			expr "$todo" : "$re_done" > /dev/null &&
-				check='- [ ]' || check='- [x]'
+				check='- [ ]' || check='- [X]'
 			awk -v str="$todo" -v check="$check" \
 				'$0 == str { gsub (/- \[[ xX]]/, check) } { print }' \
 				"$todo_file" > "$tmp"
