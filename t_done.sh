@@ -123,7 +123,7 @@ t_print() {
 # t_select(number|regex)
 # returns: selected todos
 t_select() {
-	if expr "$1" + 0 > /dev/null 2>&1; then
+	if [ $(( $1 + 0 )) -gt 0 ]; then
 		sed -n "$1p"
 	else
 		casematch=
