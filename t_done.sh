@@ -71,7 +71,7 @@ t_read() {
 	query="$*"
 	casematch=
 	expr "$query" : '\(.*[A-Z].*\)' > /dev/null || casematch='-i'
-	todo_list=$(grep $casematch "$re_prefix.*$*" "$todo_file")
+	todo_list=$(grep $wholeword $casematch "$re_prefix.*$*" "$todo_file")
 
 	if [ -n "$todo_list" ]; then
 		due_list=$(echo "$todo_list" | grep "$re_date")
@@ -173,7 +173,7 @@ t_openurl() {
 	t_select "$1" | grep -Eo "https?://[^ ]+" | xargs open
 }
 
-while getopts ':ab:Dd:ehk:ns:Tz:' opt; do
+while getopts ':ab:Dd:ehk:nSs:Tz:' opt; do
 	case $opt in
 		(h) usage ;;
 		(a) showall=0;;
@@ -183,6 +183,7 @@ while getopts ':ab:Dd:ehk:ns:Tz:' opt; do
 		(e) ${EDITOR:-vi} "$todo_file"; exit 0;;
 		(k) kill=$OPTARG;;
 		(n) export=0;;
+		(S) wholeword=-w;;
 		(s) query=$OPTARG;;
 		(T) due=" $(date +%F)";;
 		(z) toggle=$OPTARG;;
