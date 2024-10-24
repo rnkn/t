@@ -173,24 +173,22 @@ t_openurl() {
 	t_select "$1" | grep -Eo "https?://[^ ]+" | xargs open
 }
 
-while getopts ':ab:Dd:ehk:nSs:Tz:' opt; do
+while getopts :ab:Dd:ehk:nS:s:Tz: opt; do
 	case $opt in
 		(h) usage ;;
-		(a) showall=0;;
-		(b) openurl=$OPTARG;;
-		(D) onlydone=0;;
-		(d) markdone=$OPTARG;;
-		(e) ${EDITOR:-vi} "$todo_file"; exit 0;;
-		(k) kill=$OPTARG;;
-		(n) export=0;;
-		(S) wholeword=-w;;
-		(s) query=$OPTARG;;
-		(T) due=" $(date +%F)";;
-		(z) toggle=$OPTARG;;
-		(:) printf "t: option -%s requires an argument\n" "$OPTARG"
-			exit 2 ;;
-		(*) printf "t: unrecognized option -%s\n\n" "$OPTARG"
-			usage ;;
+		(a) showall=0 ;;
+		(b) openurl=$OPTARG ;;
+		(D) onlydone=0 ;;
+		(d) markdone=$OPTARG ;;
+		(e) ${EDITOR:-vi} "$todo_file"; exit 0 ;;
+		(k) kill=$OPTARG ;;
+		(n) export=0 ;;
+		(S) query=$OPTARG; wholeword=-w ;;
+		(s) query=$OPTARG ;;
+		(T) due=" $(date +%F)" ;;
+		(z) toggle=$OPTARG ;;
+		(:) printf "t: option -%s requires an argument\n" "$OPTARG"; exit 2 ;;
+		(*) printf "t: unrecognized option -%s\n\n" "$OPTARG"; usage ;;
 	esac
 done
 
